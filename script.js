@@ -9,58 +9,57 @@ const form = document.getElementById('form')
 const search = document.getElementById('search')
 
 getMovies(APIURL)
-async function getMovies(url) {
-    const resp = await fetch(url)
-    const respData = await resp.json()
 
-    showMovies(respData.results)
+async function getMovies(uri){
+   const resp = await fetch(uri)
+   const respData = await resp.json()
+   showMovies(respData.results)
 }
 
 function showMovies(movies){
+    main.innerHTML = ""
+    movies.forEach(node => {
+        const {vote_average, title, overview, poster_path} = node
 
-    main.innerHTML = ''
-
-     movies.forEach(movie =>{
-        const { poster_path, title, vote_average, overview} = movie;
-
-        if (!poster_path) {
-            return;
+        if (!node) {
+            return
         }
-
         const movieEl = document.createElement('div')
-        movieEl.classList.add('div')
+            movieEl.classList.add('div')
         movieEl.innerHTML = `
         <div class="movie">
         <img src="${IMGPATH + poster_path}" alt="">
         <div class="movie-info">
             <h3>${title}</h3>
-            <span class="${getClassbyRate(vote_average)}">${vote_average}</span> 
+            <span class="${getRatingColor(vote_average)}">${vote_average}</span> 
         </div>
         <div class="overview"><h3>Overview</h3>${overview}</div>
     </div>
-    `
-
+        `
         main.appendChild(movieEl)
-     })
-}
-
-function getClassbyRate(vote){
-    if(vote >= 8){
-        return 'green'
-    }
-    if(vote >= 5){
-        return 'yellow'
-    } else{
-        return 'red'
-    }
-}
-
-form.addEventListener('submit',(e) =>{
-    e.preventDefault()
+    });
     
-    const searchTerm = search.value
+}
 
-    if(searchTerm){
-        getMovies(SEARCHAPI + searchTerm)
-    }
+function getRatingColor(vote){
+   if (vote < 5) {
+     return "red"
+   } else if(vote > 5){
+      return "yellow"
+   } else if(vote > 8){
+      return "green"
+   }
+}
+
+form.addEventListener('input', (e)=>{
+     e.preventDefault;
+     const {value} = search;
+     getMovies(SEARCHAPI + value)
+
+     if(!value){
+        getMovies(APIURL)
+     }
+
 })
+
+
